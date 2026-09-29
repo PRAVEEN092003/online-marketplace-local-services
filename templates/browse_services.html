@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Services - Online Marketplace{% endblock %}
+
+{% block content %}
+<div class="container page-section">
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('customer_dashboard') }}" class="text-decoration-none">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Browse Services</li>
+                </ol>
+            </nav>
+            <h2 class="page-title mb-0">Browse Services</h2>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <form method="GET" action="{{ url_for('browse_services') }}" class="d-flex gap-2" role="search">
+                <input
+                    type="search"
+                    id="search-input"
+                    name="q"
+                    class="form-control"
+                    placeholder="Search by title, skills, or location..."
+                    value="{{ query }}"
+                    aria-label="Search services"
+                >
+                <button type="submit" class="btn btn-primary px-4">Search</button>
+                {% if query %}
+                    <a href="{{ url_for('browse_services') }}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    {% if query %}
+        <p class="text-muted small mb-3">
+            Showing <strong>{{ services | length }}</strong> result(s) for
+            &ldquo;<strong>{{ query }}</strong>&rdquo;
+        </p>
+    {% else %}
+        <p class="text-muted small mb-3">
+            <strong>{{ services | length }}</strong> service(s) available
+        </p>
+    {% endif %}
+
+    <!-- Service Cards -->
+    {% if not services %}
+        <div class="card">
+            <div class="empty-state">
+                <div class="empty-state-icon">&#128269;</div>
+                {% if query %}
+                    <h5 class="fw-bold mb-1">No results found</h5>
+                    <p class="text-muted mb-4">No services match &ldquo;{{ query }}&rdquo;. Try a different search term.</p>
+                    <a href="{{ url_for('browse_services') }}" class="btn btn-outline-primary">View All Services</a>
+                {% else %}
+                    <h5 class="fw-bold mb-1">No Services Available Yet</h5>
+                    <p class="text-muted">Freelancers haven't added any services yet. Check back soon!</p>
+                {% endif %}
+            </div>
+        </div>
+
+    {% else %}
+        <div class="row g-4">
+            {% for service in services %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-hover h-100">
+                    <div class="card-body p-4 d-flex flex-column">
+
+                        <!-- Price badge top-right -->
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-bold mb-0" style="line-height:1.3;">{{ service.title }}</h5>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 ms-2 flex-shrink-0">
+                                ₹{{ "{:,.0f}".format(service.price) if (service.price % 1 == 0) else "{:,.2f}".format(service.price) }}
+                            </span>
+                        </div>
+
+                        <!-- Short description (truncated) -->
+                        <p class="card-text text-muted small flex-grow-1 mb-3"
+                           style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
+                            {{ service.description }}
+                        </p>
+
+                        <!-- Skills -->
+                        {% if service.skills %}
+                        <div class="mb-2">
+                            {% for skill in service.skills.split(',') %}
+                                <span class="badge bg-light text-dark border me-1 mb-1">{{ skill.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Freelancer & Location meta -->
+                        <div class="small text-muted mb-3">
+                            <div>
+                                &#128100;
+                                <strong>
+                                    {% if freelancers.get(service.id) %}
+                                        {{ freelancers[service.id].name }}
+                                    {% else %}
+                                        Unknown Freelancer
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            <div>&#128205; {{ service.location }}</div>
+                        </div>
+
+                        <!-- View Details button -->
+                        <a href="{{ url_for('service_detail', service_id=service.id) }}"
+                           class="btn btn-outline-primary btn-sm mt-auto" id="view-service-{{ service.id }}">
+                            View Details &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

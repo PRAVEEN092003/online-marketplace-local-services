@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}{{ service.title }} - Service Details - Online Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('customer_dashboard') }}" class="text-decoration-none">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('browse_services') }}" class="text-decoration-none">Browse Services</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Service Details</li>
+                </ol>
+            </nav>
+
+            <!-- Service Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-body p-4 p-md-5">
+
+                    <!-- Title & Price -->
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                        <div>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill small fw-semibold mb-2">
+                                Service Listing
+                            </span>
+                            <h1 class="h3 fw-bold mb-0">{{ service.title }}</h1>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle fs-5 px-3 py-2">
+                            ₹{{ "{:,.0f}".format(service.price) if (service.price % 1 == 0) else "{:,.2f}".format(service.price) }}
+                        </span>
+                    </div>
+
+                    <!-- Location -->
+                    <p class="text-muted small mb-4">
+                        &#128205; <strong>{{ service.location }}</strong>
+                    </p>
+
+                    <!-- Description -->
+                    <h6 class="fw-bold text-uppercase text-muted small mb-2">Description</h6>
+                    <p class="mb-4" style="white-space: pre-wrap; line-height: 1.7;">{{ service.description }}</p>
+
+                    <!-- Skills -->
+                    {% if service.skills %}
+                    <h6 class="fw-bold text-uppercase text-muted small mb-2">Skills &amp; Tags</h6>
+                    <div class="mb-4">
+                        {% for skill in service.skills.split(',') %}
+                            <span class="badge bg-light text-dark border me-1 mb-1 px-2 py-1">{{ skill.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Send Request -->
+                    <hr class="my-4">
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('send_service_request', service_id=service.id) }}"
+                           class="btn btn-primary px-4 fw-semibold"
+                           id="send-request-btn-{{ service.id }}">
+                            Send Service Request
+                        </a>
+                        <a href="{{ url_for('browse_services') }}" class="btn btn-outline-secondary px-4">
+                            &larr; Back to Browse
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Freelancer Info Card -->
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-uppercase text-muted small mb-3">About the Freelancer</h6>
+
+                    {% if freelancer_user %}
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center fw-bold text-primary"
+                             style="width:48px;height:48px;font-size:1.2rem;">
+                            {{ freelancer_user.name[0].upper() }}
+                        </div>
+                        <div>
+                            <div class="fw-semibold">{{ freelancer_user.name }}</div>
+                            <div class="small text-muted">Freelancer</div>
+                        </div>
+                    </div>
+
+                    <dl class="row small mb-0">
+                        {% if profile and profile.bio %}
+                        <dt class="col-sm-3">Bio</dt>
+                        <dd class="col-sm-9">{{ profile.bio }}</dd>
+                        {% endif %}
+
+                        {% if profile and profile.skills %}
+                        <dt class="col-sm-3">Skills</dt>
+                        <dd class="col-sm-9">
+                            {% for skill in profile.skills.split(',') %}
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1">{{ skill.strip() }}</span>
+                            {% endfor %}
+                        </dd>
+                        {% endif %}
+
+                        {% if profile and profile.location %}
+                        <dt class="col-sm-3">Location</dt>
+                        <dd class="col-sm-9">&#128205; {{ profile.location }}</dd>
+                        {% endif %}
+                    </dl>
+                    {% else %}
+                    <p class="text-muted small mb-0">Freelancer information not available.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

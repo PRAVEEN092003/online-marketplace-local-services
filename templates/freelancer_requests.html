@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Service Requests - LocalMarketplace{% endblock %}
+
+{% block content %}
+<div class="container page-section">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('freelancer_dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Service Requests</li>
+                </ol>
+            </nav>
+            <h2 class="page-title">Service Requests</h2>
+        </div>
+    </div>
+
+    {% if not requests %}
+        <div class="card">
+            <div class="empty-state">
+                <div class="empty-state-icon">&#128235;</div>
+                <h5 class="fw-bold mb-1">No Requests Yet</h5>
+                <p class="text-muted small mb-4">
+                    You haven't received any service requests yet.<br>
+                    Make sure your profile is complete and your services are listed.
+                </p>
+                <a href="{{ url_for('my_services') }}" class="btn btn-outline-primary px-4">
+                    View My Services
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">#</th>
+                            <th>Customer</th>
+                            <th>Service</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="pe-4 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr>
+                            <td class="ps-4" data-label="#">{{ loop.index }}</td>
+                            <td data-label="Customer"><span class="fw-semibold">{{ req.customer.name }}</span></td>
+                            <td data-label="Service" class="text-muted">{{ req.service.title }}</td>
+                            <td data-label="Message" class="text-muted"
+                                style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                {{ req.message or '—' }}
+                            </td>
+                            <td data-label="Date" class="text-muted text-nowrap">
+                                {{ req.created_at.strftime('%d %b %Y') }}
+                            </td>
+                            <td data-label="Status">
+                                {% if req.status == 'Pending' %}
+                                    <span class="status-badge status-pending">&#9679; Pending</span>
+                                {% elif req.status == 'Accepted' %}
+                                    <span class="status-badge status-accepted">&#10003; Accepted</span>
+                                {% elif req.status == 'Rejected' %}
+                                    <span class="status-badge status-rejected">&#10007; Rejected</span>
+                                {% elif req.status == 'Completed' %}
+                                    <span class="status-badge status-completed">&#9733; Completed</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Actions" class="pe-4 text-end">
+                                {% if req.status == 'Pending' %}
+                                    <form method="POST"
+                                          action="{{ url_for('update_request_status', req_id=req.id) }}"
+                                          class="d-inline">
+                                        <input type="hidden" name="status" value="Accepted">
+                                        <button type="submit" class="btn btn-sm btn-outline-primary me-1"
+                                                id="accept-req-{{ req.id }}">Accept</button>
+                                    </form>
+                                    <form method="POST"
+                                          action="{{ url_for('update_request_status', req_id=req.id) }}"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Reject this request?');">
+                                        <input type="hidden" name="status" value="Rejected">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                id="reject-req-{{ req.id }}">Reject</button>
+                                    </form>
+                                {% elif req.status == 'Accepted' %}
+                                    <form method="POST"
+                                          action="{{ url_for('update_request_status', req_id=req.id) }}"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Mark this request as Completed?');">
+                                        <input type="hidden" name="status" value="Completed">
+                                        <button type="submit" class="btn btn-sm btn-outline-success"
+                                                id="complete-req-{{ req.id }}">Mark Complete</button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="text-muted small mt-2">{{ requests | length }} request(s) total</p>
+    {% endif %}
+
+</div>
+{% endblock %}

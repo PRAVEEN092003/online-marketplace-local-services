@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Online Marketplace for Local Services and Freelancers — connect customers with trusted local professionals.">
+    <title>{% block title %}LocalMarketplace — Online Services & Freelancers{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <span class="text-primary">Local</span>Marketplace
+            </a>
+
+            <!-- Mobile toggler -->
+            <button class="navbar-toggler border-0" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Nav links -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}"
+                           href="{{ url_for('home') }}">Home</a>
+                    </li>
+
+                    {% if session.get('user_id') %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint in ['customer_dashboard','freelancer_dashboard','dashboard'] %}active{% endif %}"
+                           href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+
+                    {% if session.get('user_role') == 'customer' %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'browse_services' %}active{% endif %}"
+                           href="{{ url_for('browse_services') }}">Browse Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'my_requests' %}active{% endif %}"
+                           href="{{ url_for('my_requests') }}">My Requests</a>
+                    </li>
+                    {% endif %}
+
+                    {% if session.get('user_role') == 'freelancer' %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'my_services' %}active{% endif %}"
+                           href="{{ url_for('my_services') }}">My Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'freelancer_requests' %}active{% endif %}"
+                           href="{{ url_for('freelancer_requests') }}">Requests</a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+
+                <!-- Right side -->
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                    {% if session.get('user_id') %}
+                    <li class="nav-item d-none d-lg-flex align-items-center me-2">
+                        <span class="badge bg-secondary text-capitalize px-2 py-1 me-1">
+                            {{ session.get('user_role') }}
+                        </span>
+                        <span class="small text-light opacity-75">{{ session.get('user_name') }}</span>
+                    </li>
+                    <!-- Mobile: show name as text -->
+                    <li class="nav-item d-lg-none py-1">
+                        <span class="text-light small">
+                            Logged in as <strong>{{ session.get('user_name') }}</strong>
+                            ({{ session.get('user_role') }})
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-danger btn-sm px-3"
+                           href="{{ url_for('logout') }}"
+                           id="logout-btn">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm px-3 me-1"
+                           href="{{ url_for('login') }}"
+                           id="nav-login-btn">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary btn-sm px-3"
+                           href="{{ url_for('register') }}"
+                           id="nav-register-btn">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container mt-3">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top py-3 mt-5">
+        <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+            <span class="text-muted small">
+                &copy; 2026 <strong>LocalMarketplace</strong> &mdash; Online Services &amp; Freelancers
+            </span>
+            <span class="text-muted small">
+                Built with Flask &amp; Bootstrap 5
+            </span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}My Services - Online Marketplace{% endblock %}
+
+{% block content %}
+<div class="container page-section">
+
+    <!-- Header row -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('freelancer_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Services</li>
+                </ol>
+            </nav>
+            <h2 class="page-title mb-0">My Services</h2>
+        </div>
+        {% if profile %}
+            <a href="{{ url_for('add_service') }}" class="btn btn-primary">
+                + Add New Service
+            </a>
+        {% endif %}
+    </div>
+
+    {% if not profile %}
+        <!-- No profile warning -->
+        <div class="alert alert-warning d-flex align-items-center gap-3" role="alert">
+            <span class="fs-4">&#9888;</span>
+            <div>
+                <strong>Profile Required</strong> — You must create your freelancer profile before adding services.
+                <a href="{{ url_for('freelancer_profile') }}" class="alert-link ms-2">Create Profile &rarr;</a>
+            </div>
+        </div>
+
+    {% elif not services %}
+        <!-- Empty state -->
+        <div class="card">
+            <div class="empty-state">
+                <div class="empty-state-icon">&#128196;</div>
+                <h5 class="fw-bold mb-1">No Services Yet</h5>
+                <p class="text-muted small mb-4">You haven't added any services. Start listing your skills!</p>
+                <a href="{{ url_for('add_service') }}" class="btn btn-primary px-4">+ Add Your First Service</a>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Services Table -->
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">#</th>
+                            <th>Title</th>
+                            <th>Price</th>
+                            <th>Location</th>
+                            <th>Skills</th>
+                            <th class="pe-4 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for service in services %}
+                        <tr>
+                            <td class="ps-4" data-label="#">{{ loop.index }}</td>
+                            <td data-label="Title">
+                                <div class="fw-semibold">{{ service.title }}</div>
+                                <div class="text-muted small" style="max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    {{ service.description }}
+                                </div>
+                            </td>
+                            <td data-label="Price">
+                                <span class="status-badge status-completed">₹{{ "{:,.0f}".format(service.price) if (service.price % 1 == 0) else "{:,.2f}".format(service.price) }}</span>
+                            </td>
+                            <td data-label="Location" class="text-muted small">{{ service.location }}</td>
+                            <td data-label="Skills">
+                                {% if service.skills %}
+                                    {% for skill in service.skills.split(',') %}
+                                        <span class="badge bg-light text-dark border me-1">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Actions" class="pe-4 text-end">
+                                <a href="{{ url_for('edit_service', service_id=service.id) }}"
+                                   class="btn btn-outline-primary btn-sm me-1">Edit</a>
+                                <form method="POST"
+                                      action="{{ url_for('delete_service', service_id=service.id) }}"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Delete &quot;{{ service.title }}&quot;? This cannot be undone.');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-muted small mt-2">{{ services | length }} service(s) listed</div>
+    {% endif %}
+
+</div>
+{% endblock %}

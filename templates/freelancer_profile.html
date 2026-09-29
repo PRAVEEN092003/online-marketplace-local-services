@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Online Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('freelancer_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+                </ol>
+            </nav>
+
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="fw-bold mb-1">
+                        {% if profile %}Edit Profile{% else %}Create Your Profile{% endif %}
+                    </h2>
+                    <p class="text-muted small mb-4">
+                        {% if profile %}
+                            Update your freelancer information below.
+                        {% else %}
+                            Complete your profile so customers can find and hire you.
+                        {% endif %}
+                    </p>
+
+                    <form method="POST" action="{{ url_for('freelancer_profile') }}">
+
+                        <div class="mb-3">
+                            <label for="bio" class="form-label fw-semibold">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="4"
+                                placeholder="Describe yourself, your experience and what you offer..."
+                            >{{ profile.bio if profile and profile.bio else '' }}</textarea>
+                            <div class="form-text">Tell customers about your background and expertise.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="skills" class="form-label fw-semibold">Skills</label>
+                            <input type="text" class="form-control" id="skills" name="skills"
+                                placeholder="e.g. Web Design, Plumbing, Photography, Writing"
+                                value="{{ profile.skills if profile and profile.skills else '' }}">
+                            <div class="form-text">Separate multiple skills with commas.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label fw-semibold">Location</label>
+                            <input type="text" class="form-control" id="location" name="location"
+                                placeholder="e.g. Chennai, Tamil Nadu"
+                                value="{{ profile.location if profile and profile.location else '' }}">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="phone" class="form-label fw-semibold">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone"
+                                placeholder="e.g. +91 98765 43210"
+                                value="{{ profile.phone if profile and profile.phone else '' }}">
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                                {% if profile %}Update Profile{% else %}Save Profile{% endif %}
+                            </button>
+                            <a href="{{ url_for('freelancer_dashboard') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Current Profile Preview (if exists) -->
+            {% if profile %}
+            <div class="card border-0 shadow-sm rounded-3 mt-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-muted text-uppercase small mb-3">Current Profile</h6>
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-3">Bio</dt>
+                        <dd class="col-sm-9">{{ profile.bio or '<span class="text-muted">Not set</span>' | safe }}</dd>
+                        <dt class="col-sm-3">Skills</dt>
+                        <dd class="col-sm-9">
+                            {% if profile.skills %}
+                                {% for skill in profile.skills.split(',') %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1">{{ skill.strip() }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">Not set</span>
+                            {% endif %}
+                        </dd>
+                        <dt class="col-sm-3">Location</dt>
+                        <dd class="col-sm-9">{{ profile.location or '<span class="text-muted">Not set</span>' | safe }}</dd>
+                        <dt class="col-sm-3">Phone</dt>
+                        <dd class="col-sm-9">{{ profile.phone or '<span class="text-muted">Not set</span>' | safe }}</dd>
+                    </dl>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

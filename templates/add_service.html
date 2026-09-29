@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Add Service - Online Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('freelancer_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('my_services') }}" class="text-decoration-none">My Services</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Service</li>
+                </ol>
+            </nav>
+
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="fw-bold mb-1">Add New Service</h2>
+                    <p class="text-muted small mb-4">Describe the service you're offering to customers.</p>
+
+                    <form method="POST" action="{{ url_for('add_service') }}">
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label fw-semibold">Service Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                placeholder="e.g. AC Servicing & Repair"
+                                value="{{ form_data.get('title', '') }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="4"
+                                placeholder="Describe what's included in this service, your experience, and any special details..."
+                                required>{{ form_data.get('description', '') }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="skills" class="form-label fw-semibold">Related Skills</label>
+                            <input type="text" class="form-control" id="skills" name="skills"
+                                placeholder="e.g. AC Repair, Electrical, Plumbing"
+                                value="{{ form_data.get('skills', '') }}">
+                            <div class="form-text">Optional. Separate multiple skills with commas.</div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-5">
+                                <label for="price" class="form-label fw-semibold">Price (INR) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="number" class="form-control" id="price" name="price"
+                                        placeholder="e.g. 1500" step="any" min="0"
+                                        value="{{ form_data.get('price', '') }}" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-7">
+                                <label for="location" class="form-label fw-semibold">Location <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="location" name="location"
+                                    placeholder="e.g. Chennai, Tamil Nadu or Remote"
+                                    value="{{ form_data.get('location', '') }}" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold">Add Service</button>
+                            <a href="{{ url_for('my_services') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
